@@ -5,27 +5,31 @@ import json
 from getpass import getpass
 from generate_wallet import get_public_key, get_address
 
-file_address = input('File Name: ')
-password = getpass()
 
-with open(file_address +  '.json') as f:
-    file_data = json.load(f)
+def get_key():
+    file_address = input('File Name: ')
+    password = getpass()
 
-salt = file_data['salt']
-iv = file_data['initialization vector']
-encrypted_private_key = file_data['encrypted private key']
+    with open(file_address +  '.json') as f:
+        file_data = json.load(f)
 
-salt = bytes.fromhex(salt)
-iv = bytes.fromhex(iv)
-encrypted_private_key = bytes.fromhex(encrypted_private_key)
+    salt = file_data['salt']
+    iv = file_data['initialization vector']
+    encrypted_private_key = file_data['encrypted private key']
 
-key = scrypt(password, salt, 32, N = 2**20, r = 8, p=1)
+    salt = bytes.fromhex(salt)
+    iv = bytes.fromhex(iv)
+    encrypted_private_key = bytes.fromhex(encrypted_private_key)
 
-cipher = AES.new(key, AES.MODE_CBC, iv)
+    key = scrypt(password, salt, 32, N = 2**20, r = 8, p=1)
 
-private_key = unpad(cipher.decrypt(encrypted_private_key), AES.block_size)
-public_key = get_public_key(private_key)
+    cipher = AES.new(key, AES.MODE_CBC, iv)
 
-print(private_key.decode('utf-8'))
-print(public_key)
-print(get_address(public_key))
+    private_key = unpad(cipher.decrypt(encrypted_private_key), AES.block_size)
+    public_key = get_public_key(private_key)
+
+    return private_key.decode('utf-8'), public_key, get_address(public_key)
+
+if __name__ == '__main__':
+    wallet = list(get_key())
+    print(wallet)

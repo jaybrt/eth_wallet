@@ -20,12 +20,8 @@ def new_wallet():
 
     private_key_hex = Web3.toHex(private_key)[2:]
     public_key_hex = get_public_key(private_key_hex)
-
+    
     address = get_address(public_key_hex)
-
-'''
-    print(private_key_hex, public_key_hex, address)
-'''
 
     return private_key_hex, public_key_hex, address
 
